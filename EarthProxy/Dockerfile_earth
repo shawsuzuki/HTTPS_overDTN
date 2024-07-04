@@ -1,0 +1,48 @@
+FROM ubuntu:latest
+#なんのイメージを使って作るかを指定
+
+#RUNはコマンドを実行したいとき
+EXPOSE 22 5963 5001
+#EXPOSEはポート開く
+#RUN ip a
+#RUN which iperf3
+
+RUN apt-get update
+RUN apt-get install build-essential -y
+RUN apt-get install wget -y
+RUN apt-get install -y iputils-ping net-tools
+RUN apt-get install -y iproute2 -y
+RUN apt-get install -y iperf3
+RUN apt-get install iptables -y
+RUN apt-get install bridge-utils
+RUN apt-get install traceroute
+RUN ["apt-get", "install", "-y", "vim"]
+RUN apt-get install systemctl -y
+RUN apt-get install tcpdump -y
+RUN apt install curl -y
+RUN apt install ufw -y
+RUN apt-get install dnsutils -y
+
+WORKDIR /
+RUN wget https://sourceforge.net/projects/ion-dtn/files/ion-open-source-4.1.2.tar.gz/download
+RUN tar xzvf download
+WORKDIR /ion-open-source-4.1.2
+RUN CFLAGS="-Wno-nonnull -Wno-enum-int-mismatch" ./configure
+RUN make
+RUN make install
+RUN ldconfig
+WORKDIR /
+RUN mkdir EarthProxy
+WORKDIR /EarthProxy
+RUN apt install nodejs -y 
+RUN apt install npm -y
+RUN npm install -g n
+RUN n lts
+RUN apt purge nodejs npm -y
+RUN apt autoremove -y
+RUN export PATH=/usr/local/n/versions/node/20.12.2/bin:$PATH
+RUN node -v
+RUN echo 'export PATH=/usr/local/n/versions/node/20.12.2/bin:$PATH' >> ~/.bashrc
+RUN /bin/bash -c "source ~/.bashrc"
+RUN mkdir nodejs
+RUN npm install archiver -y

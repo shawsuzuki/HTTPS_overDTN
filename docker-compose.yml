@@ -1,0 +1,57 @@
+networks:
+  network1:
+    ipam:
+      config:
+      - subnet: 192.168.80.0/24
+  network2:
+    ipam:
+      config:
+      - subnet: 192.168.30.0/24
+
+services:
+  client:
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile_client
+    container_name: client
+    networks:
+      network1:
+        ipv4_address: 192.168.80.3
+    ports:
+    - 50001:5001
+    privileged: true
+    tty: true
+
+  moonproxy:
+    build:
+      context: ./
+      dockerfile: ./MoonProxy/Dockerfile_moon
+    container_name: MoonProxy
+    volumes:
+      - ./MoonProxy/MoonProxy.js:/MoonProxy/MoonProxy.js
+      - ./MoonProxy/host150.rc:/ion-open-source-4.1.2/host150.rc
+    networks:
+      network1:
+        ipv4_address: 192.168.80.2
+      network2:
+        ipv4_address: 192.168.30.3
+    ports:
+    - 50002:5001
+    privileged: true
+    tty: true
+
+  earthproxy:
+    build:
+      context: ./
+      dockerfile: ./EarthProxy/Dockerfile_earth
+    container_name: EarthProxy
+    volumes:
+      - ./EarthProxy/EarthProxy.js:/EarthProxy/EarthProxy.js
+      - ./EarthProxy/host149.rc:/ion-open-source-4.1.2/host149.rc
+    networks:
+      network2:
+        ipv4_address: 192.168.30.2
+    ports:
+    - 50003:5001
+    privileged: true
+    tty: true
